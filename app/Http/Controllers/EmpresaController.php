@@ -2,16 +2,15 @@
 
   namespace App\Http\Controllers;
 
+  use App\Http\Requests\EmpresaRequest;
   use App\Models\Empresa;
-  use Illuminate\Database\QueryException;
+  use App\Models\Estado;
   use Illuminate\Http\Request;
   use Illuminate\Support\Facades\DB;
 
   class EmpresaController extends Controller
   {
-
     private $Empresa;
-
 
     public function __construct(Empresa $Empresa)
     {
@@ -36,7 +35,7 @@
      */
     public function create()
     {
-      $siglas = $this->Empresa->uf_estados();
+      $siglas = Estado::pluck("ds_uf", "id")->prepend("Selecione");
       return view('aplicacao.empresa.create-edit', compact('siglas'));
     }
 
@@ -46,7 +45,7 @@
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(EmpresaRequest $request)
     {
       $data = $request->all();
       if (count($data))
@@ -77,7 +76,7 @@
      */
     public function edit($id)
     {
-      $siglas  = $this->Empresa->uf_estados();
+      $siglas = Estado::pluck("ds_uf", "id")->prepend("Selecione");
       $empresa = $this->Empresa->findOrfail($id);
       if (isset($empresa))
         return view('aplicacao.empresa.create-edit', compact('empresa', 'siglas'));
@@ -92,7 +91,7 @@
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EmpresaRequest $request, $id)
     {
       if (!$empresa = $this->Empresa->findOrFail($id))
         return redirect()->back();
@@ -115,23 +114,16 @@
       {
         $empresa = $this->Empresa->findOrFail($id);
         $empresa->delete();
-        //return redirect()->route('empresa.index');
-        return response()->json('success');
+        return response()->json(['status' => 'success']);
       }
-      catch (QueryException $e)
+      catch (\Exception $e)
       {
-        return redirect()->back()->with($e->getMessage());
+        return response()->json(['error' => $e->getMessage()]);
       }
     }
 
     public function getUfEmpresa($id)
     {
-      return DB::table('empresas as e')
-                  ->select('ds_uf')
-                  ->where('e.id', '=', $id)
-                  ->get();
+      return $this->Empresa->getUfEmpresa($id);
     }
-
-
-
   }

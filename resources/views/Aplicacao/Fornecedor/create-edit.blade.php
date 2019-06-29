@@ -11,10 +11,18 @@
           </div>
           <div class="card-body">
             @if(isset($fornecedor))
-              {!! Form::model($fornecedor,['route'=>['fornecedor.update', $fornecedor->id], 'class'=>'form form-search form-ds', 'method'=>'PUT']) !!}
+              {!! Form::model($fornecedor,['route'=>['fornecedor.update', $fornecedor->id], 'class'=>'form form-search form-ds', 'id' => 'formFornecedor', 'method'=>'PUT']) !!}
             @else
-              {!! Form::open(['route'=>'fornecedor.store', 'class'=>'form form-search form-ds']) !!}
+              {!! Form::open(['route'=>'fornecedor.store', 'class'=>'form form-search form-ds', 'id' => 'formFornecedor']) !!}
             @endif
+
+            <div class="row">
+              <div class="form-group col-md-2 input-group-sm ">
+                <label for="tipo_pessoa">Tipo Pessoa</label>
+                {!! Form::select('tipo_pessoa', ['J' => 'Jurídica', 'F' => 'Física'], null, ['class'=>'form-control', 'placeholder' => 'Selecione', 'id' => 'tipo_pessoa']) !!}
+              </div>
+            </div>
+
             <div class="row">
               <div class="form-group col-md-6 input-group-sm ">
                 <label for="empresa_id">Empresa</label>
@@ -32,17 +40,17 @@
               </div>
               <div class="form-group input-group-sm col-md-6">
                 <label for="nr_cpf_cnpj">CPF/CNPJ</label>
-                {!! Form::text('nr_cpf_cnpj',null,['class'=>'form-control cpfOuCnpj']) !!}
+                {!! Form::number('nr_cpf_cnpj',null,['class'=>'form-control','id' => 'cpfCnpj']) !!}
               </div>
             </div>
-            <div class="row">
+            <div class="row" id="dadosPessoaFisica" style="display: none">
               <div class="form-group input-group-sm col-md-6">
                 <label for="nr_rg">RG</label>
                 {!! Form::text('nr_rg',null,['class'=>'form-control']) !!}
               </div>
               <div class="form-group input-group-sm col-md-6">
                 <label for="dt_nascimento">Dt. Nascimento</label>
-                {!! Form::date('dt_nascimento',null,['class'=>'form-control']) !!}
+                {!! Form::date('dt_nascimento',null,['class'=>'form-control', 'id' => 'dt_nascimento']) !!}
               </div>
             </div>
 
@@ -67,35 +75,54 @@
 @section('script')
   <script>
     $(document).ready(function () {
-      /*
-        var options = {
-            onKeyPress: function (cpf, ev, el, op) {
-                var masks = ['000.000.000-000', '00.000.000/0000-00'];
-                $('.cpfOuCnpj').mask((cpf.length > 14) ? masks[1] : masks[0], op);
-            }
-        };
 
-        $('.cpfOuCnpj').length > 11 ? $('.cpfOuCnpj').mask('00.000.000/0000-00', options) : $('.cpfOuCnpj').mask('000.000.000-00#', options);
-      */
+      $('.empresa_id').on('change', function () {
+         $.get($(this).val()+'/getUF' , function (data) {
+            console.log(data.toString());
+         });
+      });
 
-        $(".cpfOuCnpj").keypress(function(){
-            $(".cpfOuCnpj").unmask();
-            var tamanho = $(".cpfOuCnpj").val().length;
+      $('#tipo_pessoa').on('change', function () {
+        if ($(this).val() === 'F')
+          $('#dadosPessoaFisica').show();
+        else
+          $('#dadosPessoaFisica').hide();
+      });
 
-            if(tamanho == 11){
-                $(".cpfOuCnpj").mask("999.999.99-99");
-            } else if(tamanho == 14){
-                $(".cpfOuCnpj").mask("99.999.999/9999-99");
-            }
+      //
+      // $('#formFornecedor').on('submit', function (e) {
+      //   e.preventDefault();
+      //   console.log($('#tipo_pessoa').val());
+      //   console.log($('#dt_nascimento').val());
+      //
+      //   var data = new Date();
+      //   console.log(data);
+      // });
+
+      $("#cpfCnpj").keypress(function(){
+        $("#cpfCnpj").unmask();
+        var tamanho = $("#cpfCnpj").val().length;
+
+        if(tamanho == 11){
+          $("#cpfCnpj").mask("999.999.99-99");
+        } else if(tamanho == 14){
+          $("#cpfCnpj").mask("99.999.999/9999-99");
+        }
+      });
+
+
+
+      @if($errors->count() > 0)
+        Swal.fire({
+          title:'Erro!',
+          type:'error',
+          html: "@foreach($errors->all() as $error)\n" +
+            "<div class='text-center'>{{$error}}</div>" +
+            "@endforeach"
         });
+      @endif
 
 
-
-        $('.empresa_id').on('change', function () {
-           $.get($(this).val()+'/getUF' , function (data) {
-              console.log(data[0]);
-           });
-        });
     });
   </script>
 @endsection

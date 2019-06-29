@@ -8,21 +8,25 @@
             <div class="d-flex justify-content-between">
               <h5>Listagem de Empresas</h5>
               <div>
-                <a href="{{route('empresa.create')}}" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> Cadastrar</a>
+                <a href="{{route('empresa.create')}}" class="btn btn-sm btn-success"><i class="fa fa-plus"></i>
+                  Cadastrar</a>
               </div>
             </div>
           </div>
           <div class="card-body">
-              {!! Form::open(['name'=> 'form_search', 'route'=>'empresa']) !!}
+            {!! Form::open(['name'=> 'form_search', 'route'=>'empresa']) !!}
             <div class="col-md-12">
               <div class="input-group input-group-sm mb-3">
-                <input type="text" class="form-control" name="flEmpresa" placeholder="Filtre por: UF, Nome ou CNPJ" aria-describedby="button-addon2">
+                <input type="text" class="form-control" name="flEmpresa" placeholder="Filtre por: UF, Nome ou CNPJ"
+                       aria-describedby="button-addon2">
                 <div class="input-group-append">
-                  <button class="btn btn-info" type="submit"  name="search" id="button-addon2"><i class="fa fa-search"></i> Filtrar</button>
+                  <button class="btn btn-info" type="submit" name="search" id="button-addon2"><i
+                      class="fa fa-search"></i> Filtrar
+                  </button>
                 </div>
               </div>
             </div>
-              {!! Form::close() !!}
+            {!! Form::close() !!}
             <table class="table table-sm table-hover table-striped">
               <thead>
               <tr>
@@ -37,13 +41,12 @@
               @forelse($empresas as $empresa)
                 <tr>
                   <td>{{$empresa->id}}</td>
-                  <td>{{$empresa->ds_uf}}</td>
+                  <td>{{$empresa->estado->ds_uf}}</td>
                   <td>{{$empresa->nm_fantasia}}</td>
                   <td>{{$empresa->nr_cnpj}}</td>
                   <td>
                     <a href="{{route('empresa.edit', $empresa->id)}}"><i class="fa fa-pencil"></i></a>
                     <a class="btn btn-sm  btn-remove" data-id="{{$empresa->id}} "><i class="fa fa-trash"></i></a>
-
                   </td>
                 </tr>
               @empty
@@ -61,48 +64,45 @@
 @endsection
 @section('script')
   <script>
-$(document).ready(function () {
+    $(document).ready(function () {
+      $('.btn-remove').on('click', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id');
 
-       $('.btn-remove').on('click', function (e) {
-           e.preventDefault();
-           var id = $(this).data('id');
-           var routeDelete = "{{url('empresa')}}.destroy/"+id;
-           // Swal.fire({
-           //     type: 'error',
-           //     title: 'Exclusão de Empresa!',
-           //     confirmButtonClass: "btn-danger",
-           //     confirmButtonText: "Sim",
-           //     showCancelButton: true,
-           //     cancelButtonText: "Não",
-           //     footer: 'O registro será removido permanentemente!',
-           // }).then((result) =>{
-           //    if (result.value){
-           //        console.log(value);
-           //    }
-           // });
-
-
-           Swal.fire({
-               title: 'Are you sure?',
-               text: "You won't be able to revert this!",
-               type: 'warning',
-               showCancelButton: true,
-               confirmButtonColor: '#3085d6',
-               cancelButtonColor: '#d33',
-               confirmButtonText: 'Yes, delete it!'
-           }).then((result) => {
-               if (result.value) {
-                   Swal.fire(
-                       'Deleted!',
-                       'Your file has been deleted.',
-                       'success'
-                   )
-               }
-           });
-
-
-       });
-
-});
+        Swal.fire({
+          title: 'Exclusão da Empresa',
+           text: "Deseja realmente excluir?",
+           type: 'warning',
+            showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+           cancelButtonColor: '#d33',
+           confirmButtonText: 'Sim',
+            cancelButtonText: 'Não'
+        }).then((result) => {
+          if (result.value) {
+            $.ajax({
+              type: 'GET',
+               url: 'empresa/' + id + '/destroy',
+            }).done(function (data) {
+              if (data.status === 'success') {
+                Swal.fire({
+                  title: 'Removido!',
+                   text: 'Registro removido com sucesso',
+                   type: 'success'
+                }).then(function () {
+                  location.reload();
+                });
+              } else {
+                Swal.fire({
+                  title: 'Atenção!',
+                   text: 'Registro está sendo usado, por isso não pode ser removido! ',
+                   type: 'warning'
+                });
+              }
+            });
+          }
+        })
+      });
+    });
   </script>
 @endsection

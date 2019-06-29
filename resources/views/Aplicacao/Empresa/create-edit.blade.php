@@ -10,6 +10,8 @@
             </div>
           </div>
           <div class="card-body">
+
+
             @if(isset($empresa))
               {!! Form::model($empresa,['route'=>['empresa.update', $empresa->id], 'class'=>'form form-search form-ds', 'method'=>'PUT']) !!}
             @else
@@ -18,11 +20,10 @@
             <div class="row">
               <div class="form-group col-md-4 input-group-sm ">
                 <label for="ds_uf">UF</label>
-                <select name="ds_uf" class="form-control" id="ds_uf">
-                  @foreach($siglas as $sigla)
-                    <option value="{{$sigla["value"]}}">{{$sigla["descricao"]}}</option>
-                  @endforeach
-                </select>
+
+                  {!! Form::select('estado_id', $siglas, null, ['class'=> 'form-control select2']) !!}
+
+
               </div>
               <div class="form-group input-group-sm col-md-8">
                 <label for="nm_fantasia">Nome Fantasia</label>
@@ -52,4 +53,17 @@
       </div>
     </div>
   </div>
+@endsection
+@section("script")
+  <script>
+    @if($errors->count() > 0)
+      Swal.fire({
+        title:'Erro!',
+        type:'error',
+        html: "@foreach($errors->all() as $error)\n" +
+                "<div class='text-center'>{{$error}}</div>" +
+              "@endforeach"
+      });
+    @endif
+  </script>
 @endsection
