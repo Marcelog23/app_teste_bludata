@@ -5,14 +5,11 @@
   use App\Http\Requests\FornecedorRequest;
   use App\Models\Empresa;
   use App\Models\Fornecedor;
-  use Carbon\Carbon;
   use Illuminate\Database\QueryException;
   use Illuminate\Http\Request;
-  use mysql_xdevapi\Exception;
 
   class FornecedorController extends Controller
   {
-
     private $Fornecedor;
 
     public function __construct(Fornecedor $Fornecedor)
@@ -22,12 +19,14 @@
 
     /**
      * Display a listing of the resource.
-     *
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-      $fornecedores = $this->Fornecedor->getFornecedor($request->get('flFornecedor'));
+      $fornecedores = $this->Fornecedor->getFornecedor($request->get('flFornecedor'),
+                                                       $request->get('dtCadastro'),
+                                                       $request->get('strFiltro'));
       return view('aplicacao.fornecedor.index', compact('fornecedores'));
     }
 
@@ -38,17 +37,16 @@
      */
     public function create()
     {
-      $empresas = Empresa::pluck('nm_fantasia', 'id')->prepend('Selecione');
+      $empresas = Empresa::pluck('nm_fantasia', 'id');
       return view('aplicacao.fornecedor.create-edit', compact('empresas'));
     }
-
-
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
      */
     public function store(FornecedorRequest $request)
     {
@@ -56,13 +54,11 @@
       $dsUf        = Empresa::getUfEmpresa($data["empresa_id"]);
       $idadePessoa = $this->Fornecedor->getIdadePessoa($data["dt_nascimento"]);
 
+      if ($data["tipo_pessoa"] == "F" && $data["nr_rg"] == null && $data["dt_nascimento"] == null)
+        return redirect()->back()->withErrors("Os campos, Nr. RG e Dt. Nascimento são obrigatórios");
+
       if ($data["tipo_pessoa"] == "F" && current($dsUf) == "PR" && $idadePessoa < 18 )
        return redirect()->back()->withErrors("Impossivel cadastrar uma Pessoa Física menor de 18 anos no estado do Paraná!");
-
-
-
-
-
 
       if (count($data))
       {
@@ -74,17 +70,6 @@
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-      //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int $id
@@ -92,7 +77,7 @@
      */
     public function edit($id)
     {
-      $empresas   = Empresa::pluck('nm_fantasia', 'id')->prepend('Selecione');
+      $empresas   = Empresa::pluck('nm_fantasia', 'id');
       $fornecedor = $this->Fornecedor->findOrFail($id);
       if ($fornecedor)
         return view('aplicacao.fornecedor.create-edit', compact('fornecedor', 'empresas'));

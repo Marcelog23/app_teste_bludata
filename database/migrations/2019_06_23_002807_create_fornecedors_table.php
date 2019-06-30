@@ -19,6 +19,7 @@ class CreateFornecedorsTable extends Migration
             $table->string("nr_cpf_cnpj");
             $table->string("nr_telefone");
             $table->string("nr_rg")->nullable();
+            $table->date("dt_cadastro");
             $table->date("dt_nascimento")->nullable();
             $table->bigInteger('empresa_id')->unsigned()->nullable();
             $table->foreign('empresa_id')->references('id')->on('empresas');

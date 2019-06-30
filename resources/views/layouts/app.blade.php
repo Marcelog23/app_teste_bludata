@@ -9,9 +9,6 @@
 
   <title>{{ config('app.name', 'Laravel') }}</title>
 
-  <!-- Scripts -->
-  <script src="{{ asset('js/app.js') }}" defer></script>
-
   <!-- Fonts -->
   <link rel="dns-prefetch" href="//fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -19,7 +16,8 @@
   <!-- Styles -->
   <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
-
+  <!-- Select2 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
 
 </head>
 <body>
@@ -33,12 +31,26 @@
               aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
         <span class="navbar-toggler-icon"></span>
       </button>
+      @if(\Auth::check())
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav">
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Menu
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <a href="{{route('home')}}" class="dropdown-item">Dashboard</a>
+                <a href="{{route('empresa')}}" class="dropdown-item">Empresa</a>
+                <a href="{{route('fornecedor')}}" class="dropdown-item">Fornecedor</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      @endif
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <!-- Left Side Of Navbar -->
-        <ul class="navbar-nav mr-auto">
-
-        </ul>
 
         <!-- Right Side Of Navbar -->
         <ul class="navbar-nav ml-auto">
@@ -80,11 +92,13 @@
   <main class="py-4">
     @yield('content')
   </main>
-</div>
 
+</div>
 
 <script src="{{ asset('js/app.js') }}"></script>
 
+<!--select 2 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
 
 <!--SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
@@ -96,11 +110,8 @@
 <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/fontawesome.js"
         integrity="sha384-7ox8Q2yzO/uWircfojVuCQOZl+ZZBg2D2J5nkpLqzH1HY0C1dHlTKIbpRz/LG23c"
         crossorigin="anonymous"></script>
-
-
-<!--select 2 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
-
+<!--Mascaras-->
+<script src="https://unpkg.com/imask"></script>
 
 @yield('script')
 </body>

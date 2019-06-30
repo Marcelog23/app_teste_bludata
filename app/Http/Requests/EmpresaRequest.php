@@ -23,7 +23,6 @@
      */
     public function rules()
     {
-      $id = $this->route('id');
       return [
         "nm_fantasia" => "required|max:190",
         "nr_cnpj"     => "required"

@@ -10,8 +10,6 @@
             </div>
           </div>
           <div class="card-body">
-
-
             @if(isset($empresa))
               {!! Form::model($empresa,['route'=>['empresa.update', $empresa->id], 'class'=>'form form-search form-ds', 'method'=>'PUT']) !!}
             @else
@@ -20,10 +18,7 @@
             <div class="row">
               <div class="form-group col-md-4 input-group-sm ">
                 <label for="ds_uf">UF</label>
-
-                  {!! Form::select('estado_id', $siglas, null, ['class'=> 'form-control select2']) !!}
-
-
+                {!! Form::select('estado_id', $siglas, null, ['class'=> 'form-control', 'id' => 'estado_id']) !!}
               </div>
               <div class="form-group input-group-sm col-md-8">
                 <label for="nm_fantasia">Nome Fantasia</label>
@@ -31,9 +26,9 @@
               </div>
             </div>
             <div class="row">
-              <div class="form-group input-group-sm col-md-6">
+              <div class="form-group input-group-sm col-md-4">
                 <label for="nr_cnpj">CNPJ</label>
-                {!! Form::text('nr_cnpj',null,['class'=>'form-control']) !!}
+                {!! Form::text('nr_cnpj',null,['class'=>'form-control', 'id' => 'nr_cnpj']) !!}
               </div>
             </div>
             <div class=" box-footer ">
@@ -56,14 +51,24 @@
 @endsection
 @section("script")
   <script>
-    @if($errors->count() > 0)
-      Swal.fire({
-        title:'Erro!',
-        type:'error',
-        html: "@foreach($errors->all() as $error)\n" +
-                "<div class='text-center'>{{$error}}</div>" +
-              "@endforeach"
+    $(document).ready(function () {
+
+      $('#estado_id').select2();
+
+      var maskCnpj = IMask(document.getElementById('nr_cnpj'), {
+        mask: '00.000.000/0000-00'
       });
-    @endif
+
+      @if($errors->count() > 0)
+        Swal.fire({
+          title:'Erro!',
+          type:'error',
+          html: "@foreach($errors->all() as $error)\n" +
+                  "<div class='text-center'>{{$error}}</div>" +
+                "@endforeach"
+        });
+      @endif
+
+    });
   </script>
 @endsection

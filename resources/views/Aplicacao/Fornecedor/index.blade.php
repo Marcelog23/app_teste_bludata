@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('home')
 @section('content')
   <div class="container">
     <div class="row justify-content-center">
@@ -14,27 +14,43 @@
             </div>
           </div>
           <div class="card-body">
-            {!! Form::open(['name'=> 'form_search', 'route'=>'fornecedor']) !!}
-            <div class="col-md-12">
-              <div class="input-group input-group-sm mb-3">
-                <input type="text" class="form-control" name="flFornecedor"
-                       placeholder="Filtre por: Nome, CPF/CNPJ ou Dt. Cadastro" aria-describedby="button-addon2">
-                <div class="input-group-append">
-                  <button class="btn btn-info" type="submit" name="search" id="button-addon2"><i
-                      class="fa fa-search"></i> Filtrar
-                  </button>
+            <div class="mb-2">
+              {!! Form::open(['name'=> 'form_search', 'route'=>'fornecedor']) !!}
+                <div style="display: flex; justify-content: center; align-items: center ">
+                  <div class="col-md-6">
+                    <div class="form-group input-group-sm">
+                      <label for="flFornecedor">Filtre por: Nome ou CPF/CNPJ</label>
+                      {!! Form::text('flFornecedor', null, ['class' => 'form-control input-group-sm']) !!}
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="form-group input-group-sm">
+                      <label for="dtCadastro">Dt. Cadastro</label>
+                      {!! Form::date('dtCadastro', null, ['class'=> 'form-control']) !!}
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="form-group input-group-sm">
+                      <label for="strFiltro">Operação</label>
+                      {!! Form::select('strFiltro', ['=' => 'Igual' , '<' => 'Menor', '>' => 'Maior' ], null, ['class'=> 'form-control', 'placeholder' => 'Selecione']) !!}
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <button class="btn btn-info btn-sm text-white" type="submit" name="search" id="button-addon2"><i
+                        class="fa fa-search"></i> Filtrar
+                    </button>
+                  </div>
                 </div>
-              </div>
+              {!! Form::close() !!}
             </div>
-            {!! Form::close() !!}
             <table class="table table-sm table-hover table-striped">
               <thead>
               <tr>
                 <th>ID</th>
                 <th>Nome</th>
                 <th>CPF/CNPJ</th>
-                <th>Dt. Nascimento</th>
                 <th>Telefone</th>
+                <th>Dt. Cadastro</th>
                 <th>Ação</th>
               </tr>
               </thead>
@@ -43,12 +59,12 @@
                 <tr>
                   <td>{{$fornecedor->id}}</td>
                   <td>{{$fornecedor->nm_fornecedor}}</td>
-                  <td>{{$fornecedor->nr_cpf_cnpj}}</td>
-                  <td>{{$fornecedor->dt_nascimento}}</td>
+                  <td>{{$fornecedor->nr_cpf_cnpj_formatted}}</td>
                   <td>{{$fornecedor->nr_telefone}}</td>
+                  <td>{{\Carbon\Carbon::parse($fornecedor->dt_cadastro)->format("d/m/Y")}}</td>
                   <td>
-                    <a href="{{route('fornecedor.edit', $fornecedor->id)}}"><i class="fa fa-pencil"></i></a>
-                    <a class="btn btn-sm  btn-remove" data-id="{{$fornecedor->id}} "><i class="fa fa-trash"></i></a>
+                    <a href="{{route('fornecedor.edit', $fornecedor->id)}}"><i class="fa fa-edit"></i></a>
+                    <a class="btn btn-sm  btn-remove" data-id="{{$fornecedor->id}}"><i class="fa fa-trash-alt"></i></a>
                   </td>
                 </tr>
               @empty
@@ -104,9 +120,7 @@
             });
           }
         })
-
       });
-
     });
   </script>
 @endsection

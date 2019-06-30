@@ -6,7 +6,6 @@
   use App\Models\Empresa;
   use App\Models\Estado;
   use Illuminate\Http\Request;
-  use Illuminate\Support\Facades\DB;
 
   class EmpresaController extends Controller
   {
@@ -35,7 +34,7 @@
      */
     public function create()
     {
-      $siglas = Estado::pluck("ds_uf", "id")->prepend("Selecione");
+      $siglas = Estado::pluck("ds_uf", "id");
       return view('aplicacao.empresa.create-edit', compact('siglas'));
     }
 
@@ -58,17 +57,6 @@
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-      //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int $id
@@ -76,7 +64,7 @@
      */
     public function edit($id)
     {
-      $siglas = Estado::pluck("ds_uf", "id")->prepend("Selecione");
+      $siglas  = Estado::pluck("ds_uf", "id");
       $empresa = $this->Empresa->findOrfail($id);
       if (isset($empresa))
         return view('aplicacao.empresa.create-edit', compact('empresa', 'siglas'));
@@ -122,6 +110,11 @@
       }
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Support\Collection
+     * Retorna a UF da Empresa, pelo ID informado
+     */
     public function getUfEmpresa($id)
     {
       return $this->Empresa->getUfEmpresa($id);

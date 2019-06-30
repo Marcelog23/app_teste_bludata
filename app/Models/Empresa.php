@@ -14,6 +14,35 @@
     ];
 
     /**
+     * @param $value
+     * Seta UpperCase no atributo Nome
+     */
+    public function setNmFantasiaAttribute($value)
+    {
+      $this->attributes["nm_fantasia"] = strtoupper($value);
+    }
+
+    /**
+     * @param $value
+     * Remove caracteres especiais Cnpj
+     */
+    public function setNrCnpjAttribute($value)
+    {
+      $this->attributes["nr_cnpj"] = preg_replace('/[^0-9]/', "", $value);
+    }
+
+    /**
+     * @return string|string[]|null
+     * Retorna Cnpj formatado
+     */
+    public function getNrCnpjFormattedAttribute()
+    {
+      $value = $this->nr_cnpj;
+      if ($value)
+        return preg_replace('/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/', '$1.$2.$3/$4-$5', $value);
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      * Mapeamento da UF do Estado
      */
@@ -32,9 +61,11 @@
       if ($flEmpresa == null)
         return $this->all();
       else
-        return $this->where('ds_uf', '=', $flEmpresa)
-                    ->orWhere('nm_fantasia', 'LIKE', "%{$flEmpresa}%")
-                    ->orWhere('nr_cnpj', 'LIKE', "%{$flEmpresa}%")->get();
+        return $this->where('nm_fantasia', 'LIKE', "%{$flEmpresa}%")
+                  ->orWhere('nr_cnpj',     'LIKE', "%{$flEmpresa}%")
+               ->orWhereHas('estado', function ($query) use ($flEmpresa){
+                      $query->where('estados.ds_uf', '=', "$flEmpresa");
+                   })->get();
     }
 
     /**

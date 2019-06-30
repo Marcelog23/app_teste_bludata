@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('home')
 @section('content')
   <div class="container">
     <div class="row justify-content-center">
@@ -17,6 +17,7 @@
             @endif
 
             <div class="row">
+              {!! Form::hidden('dt_cadastro',date("Y-m-d"),['class'=>'form-control']) !!}
               <div class="form-group col-md-2 input-group-sm ">
                 <label for="tipo_pessoa">Tipo Pessoa</label>
                 {!! Form::select('tipo_pessoa', ['J' => 'Jurídica', 'F' => 'Física'], null, ['class'=>'form-control', 'placeholder' => 'Selecione', 'id' => 'tipo_pessoa']) !!}
@@ -36,17 +37,17 @@
             <div class="row">
               <div class="form-group input-group-sm col-md-6">
                 <label for="nr_telefone">Telefone</label>
-                {!! Form::text('nr_telefone',null,['class'=>'form-control']) !!}
+                {!! Form::text('nr_telefone',null,['class'=>'form-control', 'id' => 'nr_telefone']) !!}
               </div>
               <div class="form-group input-group-sm col-md-6">
                 <label for="nr_cpf_cnpj">CPF/CNPJ</label>
-                {!! Form::number('nr_cpf_cnpj',null,['class'=>'form-control','id' => 'cpfCnpj']) !!}
+                {!! Form::text('nr_cpf_cnpj',null,['class'=>'form-control', 'id' => 'nr_cpf_cnpj']) !!}
               </div>
             </div>
             <div class="row" id="dadosPessoaFisica" style="display: none">
               <div class="form-group input-group-sm col-md-6">
                 <label for="nr_rg">RG</label>
-                {!! Form::text('nr_rg',null,['class'=>'form-control']) !!}
+                {!! Form::text('nr_rg',null,['class'=>'form-control', 'id' => 'nr_rg']) !!}
               </div>
               <div class="form-group input-group-sm col-md-6">
                 <label for="dt_nascimento">Dt. Nascimento</label>
@@ -76,41 +77,48 @@
   <script>
     $(document).ready(function () {
 
-      $('.empresa_id').on('change', function () {
-         $.get($(this).val()+'/getUF' , function (data) {
-            console.log(data.toString());
-         });
-      });
+      $('.empresa_id').select2();
 
       $('#tipo_pessoa').on('change', function () {
         if ($(this).val() === 'F')
+        {
           $('#dadosPessoaFisica').show();
+          $('#nr_rg').addClass('required');
+          $('#dt_nascimento').addClass('required');
+        }
         else
           $('#dadosPessoaFisica').hide();
       });
 
-      //
-      // $('#formFornecedor').on('submit', function (e) {
-      //   e.preventDefault();
-      //   console.log($('#tipo_pessoa').val());
-      //   console.log($('#dt_nascimento').val());
-      //
-      //   var data = new Date();
-      //   console.log(data);
-      // });
+      var phoneMask = IMask(
+        document.getElementById('nr_telefone'), {
+          mask: [
+            {
+              mask: '(00)0000-0000',
+              maxLength: 13
+            },
+            {
+              mask: '(00)0.0000-0000'
+            }
+          ]
+        });
 
-      $("#cpfCnpj").keypress(function(){
-        $("#cpfCnpj").unmask();
-        var tamanho = $("#cpfCnpj").val().length;
 
-        if(tamanho == 11){
-          $("#cpfCnpj").mask("999.999.99-99");
-        } else if(tamanho == 14){
-          $("#cpfCnpj").mask("99.999.999/9999-99");
-        }
+      var maskCpfOuCnpj = IMask(document.getElementById('nr_cpf_cnpj'), {
+        mask:[
+          {
+            mask: '000.000.000-00',
+            maxLength: 11
+          },
+          {
+            mask: '00.000.000/0000-00'
+          }
+        ]
       });
 
-
+      var maskRg = IMask(document.getElementById('nr_rg'), {
+        mask: '00000000-00'
+      });
 
       @if($errors->count() > 0)
         Swal.fire({
@@ -121,7 +129,6 @@
             "@endforeach"
         });
       @endif
-
 
     });
   </script>
